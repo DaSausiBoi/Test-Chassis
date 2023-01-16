@@ -98,10 +98,5 @@ public final class Constants {
         public static final int RIGHT_SLAVE_ID = 3;
         public static final int LEFT_MASTER_ID = 4;
         public static final int LEFT_SLAVE_ID = 5;
-        public static final int SHOOTER_MASTER_ID = 6;
-        public static final int INTAKE_MASTER_ID = 7;
-        public static final int ELEVATOR_MASTER_ID = 8;
-        public static final int INTAKE_DRAW_ID = 9;
-        public static final int CLIMBER_MASTER_ID = 10;
     }
 }
