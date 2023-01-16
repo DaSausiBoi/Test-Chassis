@@ -45,5 +45,9 @@ public class RobotContainer {
         POVButton povLeft = new POVButton(driverController2, 270);
         POVButton povUpLeft = new POVButton(driverController2, 315);
       }
+      
+      public Command getAutonomousCommand() {
+        return null;
+      }
     
 }
