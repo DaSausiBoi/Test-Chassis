@@ -1,43 +1,36 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj.motorcontrol.Victor;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 
-/**
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import java.util.Map;
-*/
-
 public class Drivetrain extends SubsystemBase {
-  private final MotorController rightLeader = new Talon(2);
-  private final MotorController rightFollower = new Victor(3);
-  private final MotorControllerGroup right = new MotorControllerGroup(rightLeader, rightFollower);
-
-  private final MotorController leftLeader = new Talon(4);
-  private final MotorController leftFollower = new Victor(5);
-  private final MotorControllerGroup left = new MotorControllerGroup(leftLeader, leftFollower);
-
-  private final DifferentialDrive drive = new DifferentialDrive(left, right);
+    private final WPI_TalonSRX leftLeader = new WPI_TalonSRX(CanIdConstants.LEFT_LEADER_ID);
+    private final WPI_TalonSRX rightLeader = new WPI_TalonSRX(CanIdConstants.RIGHT_LEADER_ID);
+    private final WPI_VictorSPX leftFollower = new WPI_VictorSPX(CanIdConstants.LEFT_FOLLOWER_ID);
+    private final WPI_VictorSPX rightFollower = new WPI_VictorSPX(CanIdConstants.RIGHT_FOLLOWER_ID);
   
-/**
-  private ShuffleboardTab tab = Shuffleboard.getTab("Main");
-  public NetworkTableEntry maxSpeed = 
-    tab.addPersistent("Max Speed", 1)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 1))
-      .getEntry();
-  */
+    private final DifferentialDrive differentialDrive = new DifferentialDrive(leftLeader, rightLeader);
 
-  public void tankDrive(double speed, double direction){
-    drive.tankDrive(speed, direction);
+  public Drivetrain() {
+    leftLeader.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, DriveConstants.TIMEOUT);
+    rightLeader.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, DriveConstants.TIMEOUT);
+
+    leftLeader.setNeutralMode(NeutralMode.Brake);
+    rightLeader.setNeutralMode(NeutralMode.Brake);
+    rightFollower.setNeutralMode(NeutralMode.Brake);
+    leftFollower.setNeutralMode(NeutralMode.Brake);
+        
+    leftFollower.follow(leftLeader);
+    rightFollower.follow(rightLeader);
+  }
+
+  public void arcadeDrive(double speed, double direction){
+    differentialDrive.arcadeDrive(speed, direction);
   }
 }
