@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import frc.robot.commands.AutoDriveBackCommand;
+
 import frc.robot.Constants.UsbConstants;
 
 import frc.robot.subsystems.Drivetrain;
@@ -56,7 +58,8 @@ public class RobotContainer {
 
       public void initializeAutoChooser(){
         m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-     //   m_autoChooser.addOption("RedMiddleOneConeBalance", new RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+        m_autoChooser.addOption("Drive Back", new WaitCommand(0.1)
+          .andThen(new AutoDriveBackCommand(drivetrain).withTimeout(3.8)));
       
        SmartDashboard.putData("Auto Selector", m_autoChooser);
       }
