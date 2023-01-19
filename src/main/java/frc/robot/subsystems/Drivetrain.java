@@ -28,6 +28,8 @@ public class Drivetrain extends SubsystemBase {
         
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
+
+    differentialDrive.feed();
   }
 
   public void arcadeDrive(double speed, double direction){
