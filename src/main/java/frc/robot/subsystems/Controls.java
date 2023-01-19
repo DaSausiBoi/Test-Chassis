@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.controls.OverrideAllianceColor;
 
 public class Controls extends SubsystemBase {
   private boolean overrideFmsAlliance;
@@ -63,19 +62,6 @@ public class Controls extends SubsystemBase {
 
   /** Initializes values on SmartDashboard */
   private void initSmartDashboard() {
-    //    Shuffleboard.getTab("SmartDashboard")
-    //            .add("Alliance", getAllianceColorBoolean())
-    //            .withWidget(BuiltInWidgets.kBooleanBox)
-    //            .withProperties(Map.of("Color when true", "#FF0000", "Color when false",
-    // "#0000FF"));
-    Shuffleboard.getTab("Controls")
-        .add("Set Alliance Red", new OverrideAllianceColor(this, DriverStation.Alliance.Red));
-    Shuffleboard.getTab("Controls")
-        .add("Set Alliance Blue", new OverrideAllianceColor(this, DriverStation.Alliance.Blue));
-
-    Shuffleboard.getTab("Controls")
-        .addString("alliance_string", () -> getAllianceColor().toString());
-  }
 
   /** Sends values to SmartDashboard */
   private void updateSmartDashboard() {
