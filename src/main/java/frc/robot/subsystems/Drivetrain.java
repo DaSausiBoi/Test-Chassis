@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
@@ -34,5 +35,12 @@ public class Drivetrain extends SubsystemBase {
 
   public void arcadeDrive(double speed, double direction){
     differentialDrive.arcadeDrive(speed, direction);
+  }
+
+  public void execute() {
+    SmartDashboard.putNumber("LL Voltage", leftLeader.getBusVoltage());
+    SmartDashboard.putNumber("LF Voltage", leftFollower.getBusVoltage());
+    SmartDashboard.putNumber("RL Voltage", rightFollower.getBusVoltage());
+    SmartDashboard.putNumber("RF Voltage", rightFollower.getBusVoltage());
   }
 }

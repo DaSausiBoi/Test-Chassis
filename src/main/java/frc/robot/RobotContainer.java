@@ -32,6 +32,8 @@ public class RobotContainer {
         configureButtonBindings();
 
         initializeAutoChooser();
+
+        drivetrain.execute();
     
         drivetrain.setDefaultCommand(new RunCommand(() -> drivetrain.arcadeDrive(
           driverController.getRightX(),
