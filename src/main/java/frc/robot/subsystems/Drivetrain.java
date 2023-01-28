@@ -8,9 +8,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 
@@ -26,7 +28,6 @@ public class Drivetrain extends SubsystemBase {
 
   public Drivetrain() {
 
-
     leftLeader.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, DriveConstants.TIMEOUT);
     rightLeader.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0,
         DriveConstants.TIMEOUT);
@@ -39,16 +40,24 @@ public class Drivetrain extends SubsystemBase {
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
 
-    double leftDistance = leftLeader.getSelectedSensorPosition() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS;
-    double rightDistance = rightLeader.getSelectedSensorPosition() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS;
-    Rotation2d gyroHeading = gyro.getRotation2d();
-    System.out.println("leftDistance: " + String.valueOf(leftDistance) + "\trightDistance: " + String.valueOf(rightDistance) + "\tgyro: " + gyroHeading);
-    
-   m_odometry = new DifferentialDriveOdometry(
-      gyroHeading,
-      leftDistance, rightDistance,
-        new Pose2d(5.0, 13.5, new Rotation2d()));
+    rightLeader.setInverted(DriveConstants.RIGHT_INVERTED);
+    rightFollower.setInverted(DriveConstants.RIGHT_INVERTED);
+    leftLeader.setInverted(DriveConstants.LEFT_INVERTED);
+    leftFollower.setInverted(DriveConstants.LEFT_INVERTED);
 
+    gyro.reset();
+    leftLeader.setSelectedSensorPosition(0);
+    rightLeader.setSelectedSensorPosition(0);
+    double leftDistance = getLeftEncoderDistance();
+    double rightDistance = getRightEncoderDistance();
+    Rotation2d gyroHeading = gyro.getRotation2d();
+    System.out.println("leftDistance: " + String.valueOf(leftDistance) + "\trightDistance: "
+        + String.valueOf(rightDistance) + "\tgyro: " + gyroHeading);
+
+    m_odometry = new DifferentialDriveOdometry(
+        gyroHeading,
+        leftDistance, rightDistance,
+        new Pose2d(5.0, 13.5, new Rotation2d()));
 
     differentialDrive.feed();
   }
@@ -56,16 +65,120 @@ public class Drivetrain extends SubsystemBase {
   public void arcadeDrive(double speed, double direction) {
     differentialDrive.arcadeDrive(speed, direction);
   }
-  public void test(){
-    differentialDrive.feed();
-    
-        // m_odometry.getPoseMeters().
 
-      Pose2d m_pose = m_odometry.update(
-        gyro.getRotation2d(),
-        leftLeader.getSelectedSensorPosition() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS,
-        rightLeader.getSelectedSensorPosition() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS
-      );
-      System.out.println("x: " + String.valueOf(m_pose.getX()) + "\ty: " + String.valueOf(m_pose.getY()) + "\trotation " + m_pose.getRotation());
+  @Override
+  public void periodic() {
+    // Update the odometry in the periodic block
+    m_odometry.update(
+        gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+
+    SmartDashboard.putNumber("heading", getHeading());
+    SmartDashboard.putNumber("leftDistance", getLeftEncoderDistance());
+    SmartDashboard.putNumber("leftVelocity", getLeftEncoderVelocity());
+    SmartDashboard.putNumber("rightDistance", getRightEncoderDistance());
+    SmartDashboard.putNumber("rightVelocity", getRightEncoderVelocity());
+    SmartDashboard.putNumber("odometryHeading", m_odometry.getPoseMeters().getRotation().getDegrees());
+    SmartDashboard.putNumber("odometryX", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("odometryY", m_odometry.getPoseMeters().getY());
+
+  }
+
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    leftLeader.setVoltage(leftVolts);
+    rightLeader.setVoltage(rightVolts);
+    differentialDrive.feed();
+  }
+
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
+  }
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(
+        gyro.getRotation2d(),getLeftEncoderDistance(), getRightEncoderDistance(), pose);
+  }
+
+  private double getLeftEncoderDistance() {
+    return leftLeader.getSelectedSensorPosition() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS;
+  }
+
+  private double getLeftEncoderVelocity() {
+    return leftLeader.getSelectedSensorVelocity() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS;
+  }
+
+  private double getRightEncoderDistance() {
+    return rightLeader.getSelectedSensorPosition() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS;
+  }
+
+  private double getRightEncoderVelocity() {
+    return rightLeader.getSelectedSensorVelocity() / 4096 * DriveConstants.WHEEL_CIRCUMFERENCE_METERS;
+  }
+
+  /**
+   * Gets the average distance of the two encoders.
+   *
+   * @return the average of the two encoder readings
+   */
+  public double getAverageEncoderDistance() {
+    return (getLeftEncoderDistance() + getRightEncoderDistance()) / 2.0;
+  }
+
+  /**
+   * Sets the max output of the drive. Useful for scaling the drive to drive more
+   * slowly.
+   *
+   * @param maxOutput the maximum output to which the drive will be constrained
+   */
+  public void setMaxOutput(double maxOutput) {
+    differentialDrive.setMaxOutput(maxOutput);
+  }
+
+  /** Resets the drive encoders to currently read a position of 0. */
+  public void resetEncoders() {
+    leftLeader.setSelectedSensorPosition(0);
+    rightLeader.setSelectedSensorPosition(0);
+  }
+
+  /** Zeroes the heading of the robot. */
+  public void zeroHeading() {
+    gyro.reset();
+  }
+
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from -180 to 180
+   */
+  public double getHeading() {
+    return gyro.getRotation2d().getDegrees();
+  }
+
+  /**
+   * Returns the turn rate of the robot.
+   *
+   * @return The turn rate of the robot, in degrees per second
+   */
+  public double getTurnRate() {
+    return -gyro.getRate();
   }
 }

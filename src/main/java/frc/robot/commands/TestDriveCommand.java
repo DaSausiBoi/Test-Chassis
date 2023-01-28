@@ -15,7 +15,7 @@ public class TestDriveCommand extends CommandBase{
     @Override
     public void execute(){
         // drivetrain.arcadeDrive(0.5, 0);
-        drivetrain.test();
+        // drivetrain.test();
     }
 
     @Override

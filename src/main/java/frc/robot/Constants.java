@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+
 public final class Constants {
     /** USB ports on the computer */
     public static final class UsbConstants {
@@ -49,6 +51,35 @@ public final class Constants {
         public static int POV_LEFT = 270;
     }
 
+    public static final class AutoConstants {
+        // TODO: Change these values
+        // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+        // These characterization values MUST be determined either experimentally or
+        // theoretically
+        // for *your* robot's drive.
+        // The Robot Characterization Toolsuite provides a convenient tool for obtaining
+        // these
+        // values for your robot.
+        public static final double ksVolts = 0.22;
+        public static final double kvVoltSecondsPerMeter = 1.98;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+
+        // Example value only - as above, this must be tuned for your drive!
+        public static final double kPDriveVel = 8.5;
+
+        public static final double kTrackwidthMeters = 0.69;
+        public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
+                kTrackwidthMeters);
+
+        public static final double kMaxSpeedMetersPerSecond = .5;
+        public static final double kMaxAccelerationMetersPerSecondSquared = .25;
+
+        // Reasonable baseline values for a RAMSETE follower in units of meters and
+        // seconds
+        public static final double kRamseteB = 2;
+        public static final double kRamseteZeta = 0.7;
+    }
+
     /** Values relating to the robot's drive train */
     public static final class DriveConstants {
 
@@ -57,10 +88,15 @@ public final class Constants {
         public static final int MAG_ENCODER_CPR = 4096;
         // public static final int TALONFX_ENCODER_CPR = 2048;
         // !remove from calculations if not using an integrated encoder
-        // public static final double GEAR_RATIO = 11.25; // 12:50 => 20:54 on a falconfx gives 14.8 fps. Driven/Driver
-        public static final double WHEEL_DIAMETER_METERS = 0.15875;
+        // public static final double GEAR_RATIO = 11.25; // 12:50 => 20:54 on a
+        // falconfx gives 14.8 fps. Driven/Driver
+        public static final double WHEEL_DIAMETER_METERS = 0.09525;
         public static final double WHEEL_CIRCUMFERENCE_METERS = Math.PI * WHEEL_DIAMETER_METERS;
         public static final int TIMEOUT = 50;
+
+        public static final boolean RIGHT_INVERTED = true;
+        public static final boolean LEFT_INVERTED = false;
+
     }
 
     /**
